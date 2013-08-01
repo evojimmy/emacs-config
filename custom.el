@@ -1,8 +1,3 @@
-(defun fullscreen ()
-  (interactive)
-  (set-frame-parameter nil 'fullscreen
-                       (if (frame-parameter nil 'fullscreen) nil
-                         'fullboth)))
 (global-set-key [f11] 'fullscreen)
 
 
@@ -32,18 +27,27 @@ This works on the current region."
     (while (search-forward ">" nil t) (replace-match "&gt;" nil t))
     )
   )
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(inhibit-startup-screen t))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+
+
 (add-hook 'before-save-hook 'whitespace-cleanup)
 (setq-default indent-tabs-mode nil)
 
+(defun untab-all ()
+  (untabify (point-min) (point-max))
+   nil ) ; did not write buffer to disk
+
+(defun add-write-contents-hooks-hook ()
+  (add-hook
+   'write-contents-hooks
+   'untab-all
+     nil  ; APPEND  unrelated, explicit default nil as optional :)
+     t )) ; LOCAL   non-nil => make hook local
+
+;; more modes: http://www.emacswiki.org/CategoryModes
+(add-hook 'emacs-lisp-mode-hook #'add-write-contents-hooks-hook)
+(add-hook 'c-mode-common-hook   #'add-write-contents-hooks-hook)
+(add-hook 'sh-mode-hook         #'add-write-contents-hooks-hook)
+(add-hook 'text-mode-hook       #'add-write-contents-hooks-hook)
+(add-hook 'sql-mode-hook        #'add-write-contents-hooks-hook)
+(add-hook 'css-mode-hook        #'add-write-contents-hooks-hook)
+(add-hook 'web-mode-hook        #'add-write-contents-hooks-hook)
